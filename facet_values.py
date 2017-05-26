@@ -13,7 +13,7 @@ def write_out_results(response, field):
     kwzip = zip(kwds[0::2], kwds[1::2])
     mycsv = csv.writer(sys.stdout)
     for k in kwzip:
-        row = [k[0].encode('utf-8'), k[1]]
+        row = [k[0], k[1]]
         mycsv.writerows([row])
 
 
@@ -25,7 +25,7 @@ def main(field=DEFAULT_FIELD, query=DEFAULT_QUERY, solr_url=DEFAULT_SOLR_URL):
             'q': query,
             "facet": 'true',
             "facet.field": field,
-            'facet.mindount': 1,
+            'facet.mincount': 1,
             'rows': 0,
             'facet.limit': -1,
             'wt': 'json',
@@ -33,4 +33,4 @@ def main(field=DEFAULT_FIELD, query=DEFAULT_QUERY, solr_url=DEFAULT_SOLR_URL):
     if r.ok:
         write_out_results(r, field)
     else:
-        print "Error in results"
+        print("Error in results")
