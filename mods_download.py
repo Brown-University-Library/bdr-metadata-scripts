@@ -4,14 +4,11 @@ import os
 import datetime
 import begin
 import collections
-import pybagit.bagit as bagger
-import bagit as loc_bagit
 
 DEFAULT_SOLR_URL = "https://repository.library.brown.edu/api/search/"
 MODS_SERVICE_URL = 'https://repository.library.brown.edu/services/getMods/'
 DEFAULT_QUERY = "NOTHING"
 DEFAULT_BASE_DIR = "./downloaded"
-DEFAULT_ZIP_DIR = "./zipped"
 ROWS = 500
 
 
@@ -54,32 +51,29 @@ def get_sorl_docs(query=DEFAULT_QUERY, start=0, solr_url=DEFAULT_SOLR_URL):
         if numFound - start > ROWS:
             docs.extend(
                 get_sorl_docs(
-                    query=query, start=start + ROWS, solr_url=solr_url))
+                    query=query,
+                    start=start + ROWS,
+                    solr_url=solr_url
+                )
+            )
     return docs
 
-def setup_storage(base_dir, zip_dir):
+def setup_storage(base_dir):
     if not os.path.exists(base_dir):
         os.makedirs(base_dir)
-    if not os.path.exists(zip_dir):
-        os.makedirs(zip_dir)
     timestamp = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     bag_directory = os.path.join(base_dir, timestamp)
+    if not os.path.exists(bag_directory):
+        os.makedirs(bag_directory)
     return bag_directory
 
 
 @begin.start(auto_convert=True)
 def main(
         query=DEFAULT_QUERY,
-        base_dir=DEFAULT_BASE_DIR,
-        zip_dir=DEFAULT_ZIP_DIR):
-    bag_directory = setup_storage(base_dir, zip_dir)
-    bagit = bagger.BagIt(bag_directory)
+        base_dir=DEFAULT_BASE_DIR):
+    bag_directory = setup_storage(base_dir)
     docs = get_sorl_docs(query)
     for d in docs:
         doc = Mods_Doc(**d)
-        download_file(doc.url, doc.filename, bagit.data_directory)
-    bag = loc_bagit.Bag(bag_directory)
-    bag.info['Authors'] = ['Brown Digital Repository']
-    bag.save()
-    bagit.update()
-    bagit.package(zip_dir, 'zip')
+        download_file(doc.url, doc.filename, bag_directory)
