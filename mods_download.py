@@ -4,6 +4,7 @@ import os
 import datetime
 import begin
 import collections
+from tqdm import tqdm
 
 DEFAULT_SOLR_URL = "https://repository.library.brown.edu/api/search/"
 MODS_SERVICE_URL = 'https://repository.library.brown.edu/services/getMods/'
@@ -74,6 +75,6 @@ def main(
         base_dir=DEFAULT_BASE_DIR):
     bag_directory = setup_storage(base_dir)
     docs = get_sorl_docs(query)
-    for d in docs:
+    for d in tqdm(docs):
         doc = Mods_Doc(**d)
         download_file(doc.url, doc.filename, bag_directory)
