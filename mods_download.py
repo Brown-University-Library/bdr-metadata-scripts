@@ -63,18 +63,18 @@ def setup_storage(base_dir):
     if not os.path.exists(base_dir):
         os.makedirs(base_dir)
     timestamp = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-    bag_directory = os.path.join(base_dir, timestamp)
-    if not os.path.exists(bag_directory):
-        os.makedirs(bag_directory)
-    return bag_directory
+    storage_directory = os.path.join(base_dir, timestamp)
+    if not os.path.exists(storage_directory):
+        os.makedirs(storage_directory)
+    return storage_directory
 
 
 @begin.start(auto_convert=True)
 def main(
         query=DEFAULT_QUERY,
         base_dir=DEFAULT_BASE_DIR):
-    bag_directory = setup_storage(base_dir)
+    storage_directory = setup_storage(base_dir)
     docs = get_sorl_docs(query)
     for d in tqdm(docs):
         doc = Mods_Doc(**d)
-        download_file(doc.url, doc.filename, bag_directory)
+        download_file(doc.url, doc.filename, storage_directory)
