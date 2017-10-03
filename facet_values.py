@@ -2,6 +2,7 @@ import requests
 import csv
 import sys
 import begin
+from tqdm import tqdm
 
 DEFAULT_SOLR_URL = "https://repository.library.brown.edu/api/search/"
 DEFAULT_FIELD = "keyword"
@@ -12,7 +13,7 @@ def write_out_results(response, field):
     kwds = response.json()['facet_counts']['facet_fields'][field]
     kwzip = zip(kwds[0::2], kwds[1::2])
     mycsv = csv.writer(sys.stdout)
-    for k in kwzip:
+    for k in tqdm(kwzip):
         row = [k[0], k[1]]
         mycsv.writerows([row])
 
