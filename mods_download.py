@@ -35,7 +35,7 @@ class Mods_Doc(collections.namedtuple("Doc", ['pid'])):
         return MODS_SERVICE_URL+'{}/'.format(self.pid)
 
 
-def get_sorl_docs(query=DEFAULT_QUERY, start=0, solr_url=DEFAULT_SOLR_URL):
+def get_solr_docs(query=DEFAULT_QUERY, start=0, solr_url=DEFAULT_SOLR_URL):
     r = requests.get(
         solr_url,
         params={
@@ -51,7 +51,7 @@ def get_sorl_docs(query=DEFAULT_QUERY, start=0, solr_url=DEFAULT_SOLR_URL):
         docs = r.json()['response']['docs']
         if numFound - start > ROWS:
             docs.extend(
-                get_sorl_docs(
+                get_solr_docs(
                     query=query,
                     start=start + ROWS,
                     solr_url=solr_url
@@ -74,7 +74,7 @@ def main(
         query=DEFAULT_QUERY,
         base_dir=DEFAULT_BASE_DIR):
     storage_directory = setup_storage(base_dir)
-    docs = get_sorl_docs(query)
+    docs = get_solr_docs(query)
     for d in tqdm(docs):
         doc = Mods_Doc(**d)
         download_file(doc.url, doc.filename, storage_directory)
