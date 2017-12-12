@@ -7,7 +7,7 @@ import collections
 from tqdm import tqdm
 
 DEFAULT_SOLR_URL = "https://repository.library.brown.edu/api/search/"
-MODS_SERVICE_URL = 'https://repository.library.brown.edu/services/getMods/'
+MODS_URL_PATTERN = 'https://repository.library.brown.edu/storage/{pid}/MODS/'
 DEFAULT_QUERY = "NOTHING"
 DEFAULT_BASE_DIR = "./downloaded"
 ROWS = 500
@@ -32,7 +32,7 @@ class Mods_Doc(collections.namedtuple("Doc", ['pid'])):
 
     @property
     def uri(self):
-        return MODS_SERVICE_URL+'{}/'.format(self.pid)
+        return MODS_URL_PATTERN.format(pid=self.pid)
 
 
 def get_solr_docs(query=DEFAULT_QUERY, start=0, solr_url=DEFAULT_SOLR_URL):
