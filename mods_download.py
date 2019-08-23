@@ -4,9 +4,7 @@ import datetime
 import requests
 import os
 
-
 from pathos.pools import ProcessPool as Pool
-from functools import partial
 from tqdm import tqdm
 
 DEFAULT_SOLR_URL = "https://repository.library.brown.edu/api/search/"
@@ -92,9 +90,6 @@ def get_solr_docs(query=DEFAULT_QUERY, start=0, solr_url=DEFAULT_SOLR_URL):
     return docs
 
 
-
-def download_doc(doc, save_dir):
-    doc.save(save_dir)
 
 @begin.start(auto_convert=True)
 def main(
