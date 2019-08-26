@@ -1,8 +1,9 @@
-appdirs==1.4.0
-begins==0.9
-funcsigs==1.0.2
-packaging==16.8
-pyparsing==2.1.10
-requests==2.20.0
-six==1.10.0
-tqdm==4.11.2
+appdirs>=1.4.0
+begins>=0.9
+funcsigs>=1.0.2
+packaging>=16.8
+pyparsing>=2.1.10
+requests>=2.20.0
+six>=1.10.0
+tqdm>=4.11.2
+pathos>=0.2.4
