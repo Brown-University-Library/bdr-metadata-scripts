@@ -21,6 +21,8 @@ def download_file(url, filename, base_dir=DEFAULT_BASE_DIR):
         tempfilename = os.path.join(base_dir, filename)
         with open(tempfilename, 'wb') as f:
             f.write(r2.content)
+    else:
+        print(f"Problem downloading {url}")
 
 
 class Mods_Doc(collections.namedtuple("Doc", ['pid'])):
@@ -60,7 +62,6 @@ class DocSaver:
         if not os.path.exists(storage_directory):
             os.makedirs(storage_directory)
         return storage_directory
-
     def save(self, doc):
         download_file(doc.url, doc.filename, self.save_dir)
 
@@ -89,20 +90,35 @@ def get_solr_docs(query=DEFAULT_QUERY, start=0, solr_url=DEFAULT_SOLR_URL):
             )
     return docs
 
+def docs_from_query(query):
+    docs = get_solr_docs(query)
+    return [Mods_Doc(**d) for d in docs]
+
+def docs_from_file(filename):
+    with open(filename, 'r') as f:
+        pids = f.readlines()
+    return [Mods_Doc(p.strip()) for p in pids]
+
+def download(docs, pool, saver):
+    max_= len(docs)
+    with tqdm(total=max_) as pbar:
+        for i, _ in tqdm(enumerate(pool.map(saver.save, docs))):
+            pbar.update()
+    pool.close()
+    pool.join()
 
 
 @begin.start(auto_convert=True)
 def main(
         query=DEFAULT_QUERY,
         number_of_processes=DEFAULT_PROCESSES,
-        base_dir=DEFAULT_BASE_DIR):
-    docs = get_solr_docs(query)
+        base_dir=DEFAULT_BASE_DIR,
+        file=None):
     saver = DocSaver(base_dir)
     pool = Pool(number_of_processes)
-    mdocs = (Mods_Doc(**d) for d in docs)
-    max_= len(docs)
-    with tqdm(total=max_) as pbar:
-        for i, _ in tqdm(enumerate(pool.imap(saver.save, mdocs))):
-            pbar.update()
-    pool.close()
-    pool.join()
+    if file:
+        docs = docs_from_file(file)
+    else:
+        docs = docs_from_query(query)
+    download(docs, pool, saver)
+
